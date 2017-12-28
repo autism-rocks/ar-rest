@@ -1,0 +1,1 @@
+ALTER TABLE user ADD logged_in_at DATETIME NULL;

@@ -1,0 +1,42 @@
+{
+  "name": "ar-rest",
+  "version": "1.0.0",
+  "description": "Autism Rocks Rest Service",
+  "main": "index.js",
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "body-parser": "^1.18.2",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "express-logger": "0.0.3",
+    "express-session": "^1.15.6",
+    "knex": "^0.14.2",
+    "knex-orm": "^1.2.0",
+    "morgan": "^1.9.0",
+    "mysql": "^2.15.0",
+    "node-flywaydb": "^0.1.4",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-google": "^0.3.0",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db_migrate": "flyway -c .config/flyway.js migrate",
+    "db_repair": "flyway -c .config/flyway.js repair"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/autism-rocks/ar-rest.git"
+  },
+  "author": "José Fonseca",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/autism-rocks/ar-rest/issues"
+  },
+  "homepage": "https://github.com/autism-rocks/ar-rest#readme"
+}
