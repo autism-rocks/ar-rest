@@ -1,5 +1,6 @@
 module.exports = {
     'client': 'mysql',
+    'debug': true,
     'pool': {
         'min': 3,
         'max': 20
