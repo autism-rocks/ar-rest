@@ -47,15 +47,15 @@ export default function (passport) {
                     if (!user) {
                         user = new User();
                         user.set('email', profile.emails[0].value);
-                        user.set('facebook_id', profile.id);
                     }
 
+                    user.set('facebook_id', profile.id);
                     user.set('name', [profile.name.givenName, profile.name.middleName, profile.name.familyName].filter(x => x).join(' '));
                     user.set('display_name', [profile.name.givenName, profile.name.familyName].filter(x => x).join(' '));
                     user.set('logged_in_at', new Date());
                     user.set('locale', profile._json.locale);
                     user.set('timezone', profile._json.timezone);
-                    user.set('profile_photo', `https://graph.facebook.com/${user.facebook_id}/picture?type=normal`);
+                    user.set('profile_photo', `https://graph.facebook.com/${profile.id}/picture?type=normal`);
 
                     return user.save();
                 }).then((user) => {
@@ -77,9 +77,9 @@ export default function (passport) {
                 if (!user) {
                     user = new User();
                     user.set('email', profile.emails[0].value);
-                    user.set('facebook_id', profile.id);
                 }
 
+                user.set('google_id', profile.id);
                 user.set('name', [profile.name.givenName, profile.name.familyName].filter(x => x).join(' '));
                 user.set('display_name', profile.displayName);
                 user.set('logged_in_at', new Date());
