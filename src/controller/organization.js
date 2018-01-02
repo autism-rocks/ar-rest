@@ -6,7 +6,6 @@ const createOrgFields = ['name', 'display_name', 'address', 'country', 'city', '
 
 router.get('/organizations', function (req, res) {
     Organization.query().select(['id', 'display_name as value']).orderBy('display_name').then((orgs) => {
-        orgs.unshift({id:null, value:''});
         res.send(orgs);
     });
 });

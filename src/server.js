@@ -6,11 +6,11 @@ import bodyParser from 'body-parser';
 import session from 'cookie-session';
 import passport from 'passport';
 import passportInitialization from './passportInitialization';
-
-// import controllers
 import AuthController from  './controller/auth';
 import OrganizationController from  './controller/organization';
 import GeoController from  './controller/geo';
+import UserController from  './controller/user';
+
 
 
 // initialize the express server
@@ -47,6 +47,7 @@ app.use(flash());
 app.use('/ar', AuthController());
 app.use('/ar', OrganizationController());
 app.use('/ar', GeoController());
+app.use('/ar', UserController());
 
 // start accepting connections
 app.listen(port);
