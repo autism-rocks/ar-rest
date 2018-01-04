@@ -10,6 +10,7 @@ import AuthController from  './controller/auth';
 import OrganizationController from  './controller/organization';
 import GeoController from  './controller/geo';
 import UserController from  './controller/user';
+import ParticipantController from  './controller/participant';
 
 
 
@@ -48,6 +49,7 @@ app.use('/ar', AuthController());
 app.use('/ar', OrganizationController());
 app.use('/ar', GeoController());
 app.use('/ar', UserController());
+app.use('/ar', ParticipantController());
 
 // start accepting connections
 app.listen(port);

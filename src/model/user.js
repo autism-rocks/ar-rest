@@ -1,12 +1,13 @@
 import {DatabaseORM} from '../database';
 import  Organization from './organization'
-import  UserOrganization from './user_organization'
+import  Participant from './participant'
 
 export default DatabaseORM.Model.extend({
     tableName: 'user',
     organizations: function () {
-        return this.belongsToMany(Organization, 'user_organization', 'id_user',  'id_organization')
-            // .through(UserOrganization, 'id', 'id_user', 'id', 'id_organization')
-            .withPivot(['role']);
+        return this.belongsToMany(Organization, 'user_organization', 'id_user',  'id_organization').withPivot(['role']);
+    },
+    participants: function () {
+        return this.belongsToMany(Participant, 'user_participant', 'id_user',  'id_participant').withPivot(['role']);
     }
 });
