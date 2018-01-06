@@ -1,6 +1,8 @@
 import Organization from '../model/organization';
 import {DB} from '../database';
 import express from 'express';
+import isLoggedIn from '../context/isLoggedIn'
+
 let router = express.Router();
 const createOrgFields = ['name', 'display_name', 'address', 'country', 'city', 'postcode', 'phone', 'website', 'email'];
 
@@ -8,6 +10,17 @@ router.get('/organizations', function (req, res) {
     Organization.query().select(['id', 'display_name as value']).orderBy('display_name').then((orgs) => {
         res.send(orgs);
     });
+});
+
+
+router.get('/organization/:name/users', isLoggedIn, function (req, res) {
+    req.user.organizations()
+        .query({where: {name: req.params.name}})
+        .fetchOne()
+        .then((org) => org.users().fetch({columns:['id', 'name', 'email', 'role', 'country', 'city', 'logged_in_at', 'phone', 'profile_photo']}))
+        .then((users) => {
+            res.send(users.toJSON({omitPivot: true}))
+        });
 });
 
 router.post('/organizations', function (req, res) {
@@ -20,7 +33,7 @@ router.post('/organizations', function (req, res) {
         .first()
         .then((org) => {
             if (org) {
-                res.status(409).send({status: 'ERROR', message:'ORGANIZATION_ALREADY_EXISTS'});
+                res.status(409).send({status: 'ERROR', message: 'ORGANIZATION_ALREADY_EXISTS'});
             } else {
                 DB.transaction(function (trx) {
                     let org = {};
@@ -35,7 +48,7 @@ router.post('/organizations', function (req, res) {
                 }).then(function () {
                     res.send({status: 'SUCCESS', message: 'ORGANIZATION_CREATED'});
                 }).catch(function (error) {
-                    res.status(409).send({status: 'ERROR', message:'ERROR_CREATING_ORGANIZATION'});
+                    res.status(409).send({status: 'ERROR', message: 'ERROR_CREATING_ORGANIZATION'});
                     console.error(error);
                 });
             }

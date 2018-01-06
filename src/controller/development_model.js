@@ -55,7 +55,8 @@ router.get('/development_model/:lang/:ref/:id_participant', isLoggedIn, function
                                 ref: q.question_ref,
                                 description: q.question_description,
                                 previous_level: q.previous_level,
-                                current_level: q.current_level
+                                current_level: q.current_level ? q.current_level : q.previous_level,
+                                placeholder: q.current_level ? false : true
                             })
                         });
                     }

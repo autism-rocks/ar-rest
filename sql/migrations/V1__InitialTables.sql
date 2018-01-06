@@ -24,7 +24,7 @@ CREATE TABLE user_organization
 (
     id_user INT,
     id_organization INT,
-    role ENUM('ADMIN', 'HELPDESK', 'MEMBER'),
+    role ENUM('ADMIN', 'HELPDESK', 'TERAPEUT', 'MEMBER'),
     CONSTRAINT user_organization_id_user_id_organization_pk PRIMARY KEY (id_user, id_organization),
     CONSTRAINT user_organization_user_id_fk FOREIGN KEY (id_user) REFERENCES user (id),
     CONSTRAINT user_organization_organization_id_fk FOREIGN KEY (id_organization) REFERENCES organization (id)

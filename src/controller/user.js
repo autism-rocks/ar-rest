@@ -46,6 +46,20 @@ router.get('/user/profile', isLoggedIn, function (req, res) {
 
 });
 
+router.get('/user/organizations', isLoggedIn, function (req, res) {
+
+    req.user.organizations().fetch().then((orgs) => {
+        res.send(orgs.map((o) => {
+            return {
+                name: o.get('name'),
+                display_name: o.get('display_name'),
+                role: o.pivot.get('role')
+            };
+        }));
+    })
+
+});
+
 router.post('/user/profile', isLoggedIn, function (req, res) {
     let updateUser = {};
     // filter body fields
@@ -61,9 +75,10 @@ router.post('/user/profile', isLoggedIn, function (req, res) {
                         .attach({
                             id_organization: org.id,
                             role: 'MEMBER'
-                        }).then((x) => {
-                        res.send({status: 'SUCCESS', message: 'USER_PROFILE_UPDATED'});
-                    }).catch((err) => {
+                        })
+                        .then((x) => {
+                            res.send({status: 'SUCCESS', message: 'USER_PROFILE_UPDATED'});
+                        }).catch((err) => {
                         console.log(err);
                         // TODO: Only send the success status if this was indeed a primary key violation error
                         res.send({status: 'SUCCESS', message: 'USER_ALREADY_ASSOCIATED_WITH_ORGANIZATION'});

@@ -58,6 +58,32 @@ router.get('/participant/:id_participant', isLoggedIn, function (req, res) {
 });
 
 
+router.post('/participant/:id_participant', isLoggedIn, function (req, res) {
+    req.user.participants().query(function (qb) {
+        qb.where('id_participant', req.params.id_participant).whereIn('role', ['ADMIN', 'EDITOR'])
+    }).fetch().then((participants) => {
+        if (participants.length > 0) {
+            let participant = participants.first();
+            fields.forEach((f) => {
+                participant.set(f, req.body[f]);
+            });
+
+            // convert date to object
+            participant.set('dob', new Date(req.body.dob));
+
+            participant.save().then(() => {
+                res.send({status: 'SUCCESS', message: 'PARTICIPANT_DETAILS_SAVED'});
+            }).catch(() => {
+                res.status(500).send({status: 'ERROR', message: 'ERROR_UPDATING_PARTICIPANT_DETAILS'});
+            })
+
+        } else {
+            res.status(403).send({status: 'ERROR', message: 'PERMISSION_DENIED'});
+        }
+    });
+});
+
+
 export default function () {
     return router;
 };
