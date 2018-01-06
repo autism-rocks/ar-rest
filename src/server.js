@@ -6,11 +6,7 @@ import bodyParser from 'body-parser';
 import session from 'cookie-session';
 import passport from 'passport';
 import passportInitialization from './passportInitialization';
-import AuthController from  './controller/auth';
-import OrganizationController from  './controller/organization';
-import GeoController from  './controller/geo';
-import UserController from  './controller/user';
-import ParticipantController from  './controller/participant';
+
 
 
 
@@ -45,11 +41,22 @@ app.use(passport.session());
 // initialize session flash messaging
 app.use(flash());
 
-app.use('/ar', AuthController());
-app.use('/ar', OrganizationController());
-app.use('/ar', GeoController());
-app.use('/ar', UserController());
-app.use('/ar', ParticipantController());
+app.use('/ar', require('./controller/auth').default());
+app.use('/ar', require('./controller/geo').default());
+app.use('/ar', require('./controller/user').default());
+app.use('/ar', require('./controller/participant').default());
+app.use('/ar', require('./controller/organization').default());
+app.use('/ar', require('./controller/development_model').default());
+
+// global error handler
+app.use(function (err, req, res, next) {
+    console.log(err);
+    res.status(500).send({
+        status: 'ERROR',
+        message: 'UNKNOWN_SERVER_ERROR'
+    });
+    next();
+});
 
 // start accepting connections
 app.listen(port);
