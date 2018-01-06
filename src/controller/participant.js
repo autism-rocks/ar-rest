@@ -49,6 +49,14 @@ router.get('/participants', isLoggedIn, function (req, res) {
     });
 });
 
+router.get('/participant/:id_participant', isLoggedIn, function (req, res) {
+    req.user.participants().query(function (qb) {
+        qb.where('id_participant', req.params.id_participant)
+    }).fetch().then((participants) => {
+        res.send(participants.first());
+    });
+});
+
 
 export default function () {
     return router;
