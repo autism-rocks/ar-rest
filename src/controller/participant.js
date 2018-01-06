@@ -44,12 +44,9 @@ router.post('/participant', isLoggedIn, function (req, res) {
 
 
 router.get('/participants', isLoggedIn, function (req, res) {
-
     req.user.participants().fetch().then((participants) => {
         res.send(participants);
     });
-
-
 });
 
 

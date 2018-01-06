@@ -5,10 +5,9 @@ import _ from 'lodash';
 
 
 let router = express.Router();
-let fields = ['name', 'gender', 'country', 'city'];
 
 
-router.get('/development_model/:lang/:ref/:id_participant', function (req, res, next) {
+router.get('/development_model/:lang/:ref/:id_participant', isLoggedIn, function (req, res, next) {
 
     req.user.participants().query(function (qb) {
         qb.where('id_participant', req.params.id_participant)
@@ -100,7 +99,7 @@ router.get('/development_model/:lang/:ref/:id_participant', function (req, res, 
 });
 
 
-router.post('/development_model/:lang/:ref/:id_participant', function (req, res, next) {
+router.post('/development_model/:lang/:ref/:id_participant', isLoggedIn, function (req, res, next) {
 
     req.user.participants().query(function (qb) {
         qb.whereIn('role', ['ADMIN', 'EDITOR']).where('id_participant', req.params.id_participant)
@@ -138,7 +137,7 @@ router.post('/development_model/:lang/:ref/:id_participant', function (req, res,
 });
 
 
-router.post('/development_model/:lang/:ref/:id_participant/record', function (req, res, next) {
+router.post('/development_model/:lang/:ref/:id_participant/record', isLoggedIn, function (req, res, next) {
 
     req.user.participants().query(function (qb) {
         qb.whereIn('role', ['ADMIN', 'EDITOR']).where('id_participant', req.params.id_participant)
