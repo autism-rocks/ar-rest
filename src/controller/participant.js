@@ -7,6 +7,9 @@ import {DatabaseORM} from '../database';
 let router = express.Router();
 let fields = ['name', 'gender', 'country', 'city'];
 
+/**
+ * Create a new participant
+ */
 router.post('/participant', isLoggedIn, function (req, res) {
 
     DatabaseORM.transaction((tx) => {
@@ -21,12 +24,24 @@ router.post('/participant', isLoggedIn, function (req, res) {
 
 
         return participant.save(null, {transacting: tx})
-            .then((participant) => {
-                return req.user.related('participants')
-                    .attach({
-                        id_participant: participant.id,
-                        role: 'ADMIN'
-                    }, {transacting: tx})
+            // grant ADMIN permisions to creating user
+            .then((participant) => req.user.participants().attach({
+                    id_participant: participant.id,
+                    role: 'ADMIN'
+                }, {transacting: tx})
+            )
+            // grant EDITOR permissions by default to particpants on all user organizations
+            // TODO: If a user has many organizations, this code can take over all DB connections. Needs to be
+            // moved to an async queue
+            .then(() => req.user.organizations().fetch())
+            .then((organizations) => {
+                return Promise.all(
+                    organizations.map((org) => org.participants()
+                        .attach({
+                            id_participant: participant.id,
+                            role: 'EDITOR'
+                        }, {transacting: tx})
+                    ))
             })
             .then(() => {
                 return participant;
@@ -43,27 +58,38 @@ router.post('/participant', isLoggedIn, function (req, res) {
 });
 
 
+/**
+ * Return the Direct participants for the current user
+ */
 router.get('/participants', isLoggedIn, function (req, res) {
     req.user.participants().fetch().then((participants) => {
         res.send(participants);
     });
 });
 
+/**
+ * Return information about a specific participant that the current user
+ * has access to
+ */
 router.get('/participant/:id_participant', isLoggedIn, function (req, res) {
-    req.user.participants().query(function (qb) {
-        qb.where('id_participant', req.params.id_participant)
-    }).fetch().then((participants) => {
-        res.send(participants.first());
+    req.user.connectedParticipant(req.params.id_participant, ['ADMIN', 'EDITOR', 'TERAPEUT', 'VIEWER'])
+        .then((participant) => {
+        if (!participant) {
+            res.status(404).send({});
+        } else {
+            res.send(participant.toJSON({omitPivot: true}));
+        }
     });
 });
 
 
+/**
+ * Save details of a specific participant
+ */
 router.post('/participant/:id_participant', isLoggedIn, function (req, res) {
-    req.user.participants().query(function (qb) {
-        qb.where('id_participant', req.params.id_participant).whereIn('role', ['ADMIN', 'EDITOR'])
-    }).fetch().then((participants) => {
-        if (participants.length > 0) {
-            let participant = participants.first();
+    req.user.connectedParticipant(req.params.id_participant, ['ADMIN', 'EDITOR', 'TERAPEUT'])
+        .then((participant) => {
+        if (participant) {
             fields.forEach((f) => {
                 participant.set(f, req.body[f]);
             });
@@ -78,7 +104,7 @@ router.post('/participant/:id_participant', isLoggedIn, function (req, res) {
             })
 
         } else {
-            res.status(403).send({status: 'ERROR', message: 'PERMISSION_DENIED'});
+            res.status(404);
         }
     });
 });

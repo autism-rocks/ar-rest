@@ -13,19 +13,28 @@ router.get('/organizations', function (req, res) {
 });
 
 
-router.get('/organization/:name/users', isLoggedIn, function (req, res) {
+router.get('/organization/:name/users', isLoggedIn, function (req, res, next) {
     req.user.organizations()
-        .query({where: {name: req.params.name}})
+        .query(function (qb) {
+            qb.whereIn('role', ['ADMIN', 'HELPDESK', 'TERAPEUT'])
+                .where('name', req.params.name)
+        })
         .fetchOne()
-        .then((org) => org.users().fetch({columns:['id', 'name', 'email', 'role', 'country', 'city', 'logged_in_at', 'phone', 'profile_photo']}))
-        .then((users) => {
-            res.send(users.toJSON({omitPivot: true}))
-        });
+        .then(org => {
+            if (!org) {
+                res.status(404).send({});
+            } else {
+                org.users().fetch({columns: ['id', 'name', 'email', 'role', 'country', 'city', 'logged_in_at', 'phone', 'profile_photo']})
+                    .then((users) => {
+                        res.send(users.toJSON({omitPivot: true}))
+                    });
+            }
+        }).catch(next);
+
 });
 
 router.post('/organizations', function (req, res) {
     let newOrg = req.body;
-
 
     // check if the organization already exists
     Organization.query()
