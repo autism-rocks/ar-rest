@@ -33,3 +33,9 @@ Running the service
 -------------------   
 
     npm start
+    
+    
+Deployment to GCP App Engine
+----------------------------
+
+    gcloud app deploy --project autism-rocks

@@ -1,0 +1,13 @@
+runtime: nodejs
+module: rest
+env: flex
+resources:
+  cpu: 1
+  memory_gb: 0.6
+env_variables:
+  PROD: true
+beta_settings:
+  cloud_sql_instances: autism-rocks:europe-west1:autism-rocks
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 1

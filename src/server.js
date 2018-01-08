@@ -48,6 +48,13 @@ app.use('/ar', require('./controller/participant').default());
 app.use('/ar', require('./controller/organization').default());
 app.use('/ar', require('./controller/development_model').default());
 
+
+// setup healthcheck
+app.get(`/_ah/health`, function respond(req, res, next) {
+    res.send({status: 'OK'});
+    next();
+});
+
 // global error handler
 app.use(function (err, req, res, next) {
     console.log(err);
