@@ -91,7 +91,7 @@ function retrievePopulatedDevelopmentModel(modelRef, participantId, userId) {
  * @param parentGroupId
  * @returns {Array}
  */
-function buildModelTree(questions, attach, parentGroupId) {
+function buildModelTree(questions, attach, parentGroupId, parentSequenceId) {
     let data = [];
     // build the group tree
     // this is a real mess. need to figure out a better way to build the tree...
@@ -105,8 +105,8 @@ function buildModelTree(questions, attach, parentGroupId) {
     }), _.isEqual);
 
     questionsWithinGroup.forEach((group, i) => {
-        group.id = (parentGroupId ? `${parentGroupId}.` : '') + `${i + 1}`;
-        group.data = buildModelTree(questions, attach, group._id);
+        group.id = (parentSequenceId ? `${parentSequenceId}.` : '') + `${i + 1}`;
+        group.data = buildModelTree(questions, attach, group._id, group.id);
         attach(questions.filter(q => q.group_id == group._id), group);
         data.push(group);
     });
