@@ -349,7 +349,7 @@ INSERT INTO model_question_lang (id_model_question, id_lang, title, description)
 
 
 INSERT INTO model_group (id_model, id, id_parent, sequence_number, ref) VALUES (1, 20, NULL, 1, 'C');
-INSERT INTO model_group_lang (id_model_group, id_lang, name) VALUES (20, 1, 'Comportamento - é um problema?');
+INSERT INTO model_group_lang (id_model_group, id_lang, name) VALUES (20, 1, 'Comportamento');
 
 INSERT INTO model_question (id, id_model_group, ref) VALUES (90, 20, 'C1');
 INSERT INTO model_question_lang (id_model_question, id_lang, title, description) VALUES (90, 1, 'Tem noção do perigo', '');
@@ -370,7 +370,7 @@ INSERT INTO model_question_lang (id_model_question, id_lang, title, description)
 
 
 INSERT INTO model_group (id_model, id, id_parent, sequence_number, ref) VALUES (1, 21, NULL, 1, 'H');
-INSERT INTO model_group_lang (id_model_group, id_lang, name) VALUES (21, 1, 'Saúde - é um problema?');
+INSERT INTO model_group_lang (id_model_group, id_lang, name) VALUES (21, 1, 'Saúde');
 
 INSERT INTO model_question (id, id_model_group, ref) VALUES (98, 21, 'H1');
 INSERT INTO model_question_lang (id_model_question, id_lang, title, description) VALUES (98, 1, 'Selectivo na alimentação', '');
