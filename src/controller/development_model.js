@@ -37,9 +37,10 @@ function retrievePopulatedDevelopmentModel(modelRef, participantId, userId) {
             'mg.ref as group_ref',
             'mg.sequence_number as sequence',
             'mgl.name as group',
+            'mgl.description as group_description',
             'mq.id as question_id',
             'mq.ref as question_ref',
-            'mq.scale as scale',
+            'mg.scale as scale',
             'mql.title as question_title',
             'mql.description as question_description',
             'mqe_previous.level as previous_level',
@@ -56,20 +57,11 @@ function retrievePopulatedDevelopmentModel(modelRef, participantId, userId) {
                             _id: q.question_id,
                             question: q.question_title,
                             ref: q.question_ref,
-                            scale: q.scale,
                             description: q.question_description,
                             previous_level: q.previous_level,
                             current_level: q.current_level ? q.current_level : q.previous_level,
                             placeholder: q.current_level ? false : true
                         };
-
-                        if (item.previous_level) {
-                            item.previous_level = `${item.scale}:${item.previous_level}`
-                        }
-
-                        if (item.current_level) {
-                            item.current_level = `${item.scale}:${item.current_level}`
-                        }
 
                         subgroup.data.push(item)
                     });
@@ -100,7 +92,8 @@ function buildModelTree(questions, attach, parentGroupId, parentSequenceId) {
             _id: q.group_id,
             ref: q.group_ref,
             open: true,
-            group: q.group
+            group: q.group,
+            scale: q.scale
         }
     }), _.isEqual);
 
@@ -238,10 +231,10 @@ router.post('/development_model/:lang/:ref/:id_participant', isLoggedIn, functio
                 .then((e) => {
 
                     if (e) {
-                        e.level = req.body.current_level.split(':')[1];
+                        e.level = req.body.current_level;
                         return DB('model_question_eval').update(e).where({id: e.id});
                     } else {
-                        evaluation.level = req.body.current_level.split(':')[1];
+                        evaluation.level = req.body.current_level;
                         return DB.insert(evaluation).into('model_question_eval');
                     }
                 })

@@ -1,3 +1,4 @@
-ALTER TABLE model_question ADD scale VARCHAR(20) NULL;
-UPDATE model_question SET scale = 'frequency' WHERE id < 90;
-UPDATE model_question SET scale = 'problem' WHERE id >= 90;
+ALTER TABLE model_group ADD scale VARCHAR(20) NULL;
+UPDATE model_group set scale='frequency' WHERE id_parent IN (1, 6);
+UPDATE model_group set scale='confirmation' WHERE id_parent IN (12, 17);
+UPDATE model_group set scale='problem' WHERE id IN (20, 21);
