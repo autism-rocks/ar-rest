@@ -86,7 +86,6 @@ router.get('/participant/:id_participant', isLoggedIn, function (req, res) {
 
 /**
  * Returns the list of users who have direct access to a participant
- * has access to
  */
 router.get('/participant/:id_participant/users', isLoggedIn, function (req, res, next) {
     req.user.connectedParticipant(req.params.id_participant)
@@ -103,8 +102,24 @@ router.get('/participant/:id_participant/users', isLoggedIn, function (req, res,
 });
 
 /**
- * Returns the list of users who have direct access to a participant
- * has access to
+ * Returns the list of organizations who have direct access to a participant
+ */
+router.get('/participant/:id_participant/organizations', isLoggedIn, function (req, res, next) {
+    req.user.connectedParticipant(req.params.id_participant)
+        .then((participant) => {
+            if (!participant) {
+                res.status(404).send({});
+            } else {
+                participant.organizations().fetch({columns: ['id', 'email', 'display_name', 'role']}).then((organizations) => {
+                    res.send(organizations.toJSON({omitPivot: true}));
+                });
+            }
+        })
+        .catch(next);
+});
+
+/**
+ * Adds or modifies the access between user and participant
  */
 router.post('/participant/:id_participant/users', isLoggedIn, function (req, res, next) {
     req.user.connectedParticipant(req.params.id_participant, ['ADMIN'])
@@ -156,11 +171,45 @@ router.post('/participant/:id_participant/users', isLoggedIn, function (req, res
         .catch(next);
 });
 
+/**
+ * Adds or modifies the access between organization and participant
+ */
+router.post('/participant/:id_participant/organizations', isLoggedIn, function (req, res, next) {
+    req.user.connectedParticipant(req.params.id_participant, ['ADMIN'])
+        .then((participant) => {
+            if (!participant) {
+                res.status(403).send({status: 'ERROR', message: 'PERMISSION_DENIED'});
+            } else {
+                req.body.id = parseInt(req.body.id, 10);
+
+                return participant.organizations().query({where: {id_organization: req.body.id}}).fetch().then((orgs) => {
+                    let query = DB('organization_participant');
+                    if (orgs.length > 0) {
+                        query.update({role: req.body.role ? req.body.role : 'VIEWER'}).where({
+                            id_participant: participant.get('id'),
+                            id_organization: req.body.id
+                        });
+                    } else {
+                        query.insert({
+                            id_participant: participant.get('id'),
+                            id_organization: req.body.id,
+                            role: 'VIEWER'
+                        });
+                    }
+                    return query.then(() => {
+                        res.send({status: 'SUCCESS', message: 'PARTICIPANT_ORGANIZATION_ROLE_UPDATED'});
+                    });
+
+                });
+
+            }
+        })
+        .catch(next);
+});
 
 
 /**
- * Returns the list of users who have direct access to a participant
- * has access to
+ * Remove user access to a participant
  */
 router.delete('/participant/:id_participant/users', isLoggedIn, function (req, res, next) {
     req.user.connectedParticipant(req.params.id_participant, ['ADMIN'])
@@ -182,6 +231,33 @@ router.delete('/participant/:id_participant/users', isLoggedIn, function (req, r
                         })
                 } else {
                     res.status(400).send({status: 'ERROR', message: 'USER_DETAILS_MISSING'});
+                }
+            }
+        })
+        .catch(next);
+});
+
+/**
+ * Remove organization access to a participant
+ */
+router.delete('/participant/:id_participant/organizations', isLoggedIn, function (req, res, next) {
+    req.user.connectedParticipant(req.params.id_participant, ['ADMIN'])
+        .then((participant) => {
+            if (!participant) {
+                res.status(403).send({status: 'ERROR', message: 'PERMISSION_DENIED'});
+            } else {
+                if (req.body.id) {
+                    return DB('organization_participant')
+                        .where({
+                            id_participant: participant.get('id'),
+                            id_organization: parseInt(req.body.id, 10)
+                        })
+                        .delete()
+                        .then(() => {
+                            res.send({status: 'SUCCESS', message: 'PARTICIPANT_ORGANIZATION_ROLE_UPDATED'});
+                        })
+                } else {
+                    res.status(400).send({status: 'ERROR', message: 'ORGANIZATION_DETAILS_MISSING'});
                 }
             }
         })
