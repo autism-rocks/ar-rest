@@ -155,7 +155,7 @@ function getModelSummary(modelRef, participant, filters) {
                 }, 0);
                 group.average_level = Math.round(questions.reduce(function (v, p) {
                         return v + p.average_level;
-                    }, 0) / questions.length);
+                    }, 0) / questions.length * 10) / 10;
             }
         }))
 

@@ -1,6 +1,7 @@
 import {DatabaseORM} from '../database';
 import  User from './user'
 import  Participant from './participant'
+import  Resource from './resource'
 
 export default DatabaseORM.Model.extend({
     tableName: 'organization',
@@ -11,5 +12,9 @@ export default DatabaseORM.Model.extend({
 
     participants: function () {
         return this.belongsToMany(Participant, 'organization_participant', 'id_organization',  'id_participant').withPivot(['role']);
+    },
+
+    resources: function() {
+        return this.hasMany(Resource, 'id_organization', 'id');
     }
 })

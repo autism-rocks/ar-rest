@@ -47,6 +47,8 @@ app.use('/ar', require('./controller/user').default());
 app.use('/ar', require('./controller/participant').default());
 app.use('/ar', require('./controller/organization').default());
 app.use('/ar', require('./controller/development_model').default());
+app.use('/ar', require('./controller/resources').default());
+app.use('/ar', require('./controller/lang').default());
 
 
 // setup healthcheck
