@@ -13,11 +13,11 @@ router.get('/organizations', function (req, res) {
 });
 
 
-router.get('/organization/:name/users', isLoggedIn, function (req, res, next) {
+router.get('/organization/:org/users', isLoggedIn, function (req, res, next) {
     req.user.organizations()
         .query(function (qb) {
             qb.whereIn('role', ['ADMIN', 'HELPDESK', 'TERAPEUT'])
-                .where('name', req.params.name)
+                .where('name', req.params.org)
         })
         .fetchOne()
         .then(org => {
@@ -28,6 +28,28 @@ router.get('/organization/:name/users', isLoggedIn, function (req, res, next) {
                     .then((users) => {
                         res.send(users.toJSON({omitPivot: true}))
                     });
+            }
+        }).catch(next);
+
+});
+
+router.post('/organization/:org/users/:id_user', isLoggedIn, function (req, res, next) {
+    req.user.organizations()
+        .query(function (qb) {
+            qb.whereIn('role', ['ADMIN'])
+                .where('name', req.params.org)
+        })
+        .fetchOne()
+        .then(org => {
+            if (!org) {
+                res.status(403).send({status: 'ERROR', message: 'PERMISSION_DENIED'});
+            } else if (req.params.id_user != req.user.get('id')) {
+                org.users()
+                    .updatePivot({role: req.body.role}, {query: {where: {id_user: req.params.id_user}}}).then(() => {
+                    res.send({status: 'SUCCESS', message: 'ROLE_UPDATED'});
+                });
+            } else {
+                res.status(403).send({status: 'ERROR', message: 'CANNOT_UPDATE_OWN_ROLE'});
             }
         }).catch(next);
 
